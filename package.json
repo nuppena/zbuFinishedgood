@@ -1,0 +1,68 @@
+{
+  "name": "zbuFinishedgood",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@cap-js-community/odata-v2-adapter": "^1.15.2",
+    "@sap-cloud-sdk/http-client": "^4.1.1",
+    "@sap-cloud-sdk/util": "^4.1.1",
+    "@sap/cds": "^9",
+    "@sap/cds-odata-v2-adapter-proxy": "^1.9.21",
+    "@sap/xssec": "^4",
+    "base-64": "^1.0.0",
+    "express": "^4",
+    "passport": "^0.7.0",
+    "stream": "^0.0.3",
+    "xlsx": "^0.18.5"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@cap-js/cds-types": "^0.13.0",
+    "@cap-js/sqlite": "^2",
+    "@sap/cds-dk": ">=8",
+    "mbt": "^1.2.29",
+    "rimraf": "^5.0.5"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch-packaging": "cds watch --open packaging/webapp/index.html?sap-ui-xx-viewCache=false",
+    "undeploy": "cf undeploy zbuFinishedgood --delete-services --delete-service-keys --delete-service-brokers",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1"
+  },
+  "cds": {
+    "requires": {
+      "uaa": {
+        "auth": "xsuaa"
+      },
+      "xsuaa_api": {
+        "kind": "rest",
+        "credentials": {
+          "url": "<from XSUAA service binding>",
+          "forwardAuthToken": true
+        }
+      },
+      "cov2ap": {
+        "plugin": true
+      },
+      "AWSAPI": {
+        "kind": "rest",
+        "credentials": {
+          "destination": "AWS_PCF_BACKEND_API",
+          "forwardAuthToken": true
+        },
+        "auth": {
+          "kind": "jwt-auth"
+        },
+        "connectivity": true,
+        "destinations": true,
+        "application-logging": true
+      }
+    }
+  }
+}

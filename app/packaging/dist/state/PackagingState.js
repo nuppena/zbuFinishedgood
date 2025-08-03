@@ -1,0 +1,2 @@
+sap.ui.define(["../model/BaseObject"],function(e){"use strict";let t=e.extend("pcf.com.acc.packaging.state.PackagingState",{constructor:function(t,a){let c=this;c.MassGRGIService=t;c.BusyCounter=0;c.ResourceBundle=a;c.ViewController=null;c.bDateThresholdAccepted=false;c.data={display:true};e.call(c,{isState:true})}});return t});
+//# sourceMappingURL=PackagingState.js.map

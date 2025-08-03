@@ -1,0 +1,21 @@
+POST http://localhost:4004/odata/v2/packaging-efcalculation/loadFinishedGoods
+Content-Type: application/json
+
+{
+    "uName": "uppena",
+    "material": [
+        {
+            "Site_ID": "DE2",
+            "Finished_Good_ID": "G2",
+            "Finished_Good_Weight": 24.5
+        }
+    ]
+}
+
+###
+POST http://localhost:4004/odata/v2/packaging-efcalculation/runFinishedGoods
+Content-Type: application/json
+
+###
+POST http://localhost:4004/odata/v2/packaging-efcalculation/fetchFinishedGoods
+Content-Type: application/json

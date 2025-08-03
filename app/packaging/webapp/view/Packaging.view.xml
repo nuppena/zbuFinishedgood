@@ -1,0 +1,112 @@
+<mvc:View
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
+  xmlns:smartTable="sap.ui.comp.smarttable"
+  xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified"  xmlns:f="sap.f"
+  xmlns="sap.m" xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+  controllerName="pcf.com.acc.packaging.controller.Packaging">
+  <Page id="page1" showHeader="true"  title="Mapping to finished goods" titleAlignment="Center">
+   <content>
+  <Panel >
+                    <VBox class="sapUiSmallMargin">
+                   <HBox justifyContent="End" alignItems="Center" class="sapUiSmallMarginBottom">
+                            <Button text="Download Template" type="Transparent" press="onDownloadTemplate" class="sapUiTinyMarginEnd"/>
+                            <Button text="Import" type="Transparent" press="onOpenUploadDialog" class="sapUiTinyMarginEnd"/>
+                             <Button text="Export" type="Transparent" press="onExport" class="sapUiTinyMarginEnd"/>
+                             <Button text="Run"  type="Emphasized" press="onSaveChanges"/>
+     
+                        </HBox>
+                    </VBox>
+  </Panel>
+<Panel >
+<smartFilterBar:SmartFilterBar
+      id="smartFilterBar"
+      entitySet="EFData"
+      liveMode="false"
+    enableBasicSearch="true"
+      persistencyKey="EFCalculationFilter"
+       >
+        
+  </smartFilterBar:SmartFilterBar>
+    <smartTable:SmartTable
+      id="smartTable"
+      entitySet="EFData"
+      smartFilterId="smartFilterBar"
+      tableType="Table"
+      enableExport="true"
+      useVariantManagement="false"
+      useTablePersonalisation="true"
+      header=""
+      editable="true"
+      enableAutoBinding="false"
+      persistencyKey="EFSmartTable"
+      requestAtLeastFields="SiteID,ErrorStatus"
+      app:p13nDialogSettings="{group:{visible:false}}">
+                <smartTable:customToolbar>
+                <Toolbar design="Transparent">
+                    <ToolbarSpacer />
+                    
+                </Toolbar>
+            </smartTable:customToolbar>
+            <Table id="table" items="{excelData>/results}" enableBusyIndicator="true">
+                	<columns>
+				<Column id="Kunnr" hAlign="Begin">
+					<customData>
+						<core:CustomData key="p13nData"
+										 value='\{"columnKey": "Kunnr", "autoColumnWidth": \{ "visibleProperty": "Name1" }, "columnIndex": 2, "leadingProperty": "Kunnr", "sortProperty": "Kunnr", "filterProperty":"Kunnr"}' />
+					</customData>
+					<Text text="SiteID"  />
+				</Column>
+				<Column id="Dmbtr" hAlign="Begin">
+					<customData>
+						<core:CustomData key="p13nData"
+							value='\{"columnKey": "Dmbtr", "autoColumnWidth": true, "maxLength": 5,"columnIndex":4, "isCurrency": true, "leadingProperty": "Dmbtr", "sortProperty": "Dmbtr", "filterProperty":"Dmbtr"}' />
+					</customData>
+					<Text text="Finished Good ID" />
+				</Column>
+        
+              <Column  id="WeightUnit" hAlign="Begin">
+                <customData>
+                  <core:CustomData key="p13nData" value='{"columnKey":"WeightUnit","leadingProperty":"Weight Unit","columnIndex":6,"filterProperty":"Weight Unit","sortProperty":"Weight Unit"}'/>
+                </customData>
+                <Text text="Finished Good Weight(kg)"/>
+              </Column>
+
+              <Column id="Spend" hAlign="Begin">
+                <customData>
+                  <core:CustomData key="p13nData" value='{"columnKey":"Spend","leadingProperty":"Spend(in Millions)","columnIndex":7,"filterProperty":"Spend(in Millions)","sortProperty":"Spend(in Millions)","type":"numeric"}'/>
+                </customData>
+                <Text text="Emissions Intensity(kgCO₂e/kg)"/>
+              </Column>
+
+              <Column id="SpendCurrencyUnit" hAlign="Begin">
+                <customData>
+                  <core:CustomData key="p13nData" value='{"columnKey":"SpendCurrencyUnit","leadingProperty":"Spend Currency Unit","columnIndex":8,"filterProperty":"Spend Currency Unit","sortProperty":"Spend Currency Unit"}'/>
+                </customData>
+                <Text text="Emissions Allocated to FG(kgCO₂e)"/>
+              </Column>
+
+			</columns>
+			<items>
+       <ColumnListItem>
+      <cells>
+        <Text text="{excelData>Site ID}" />
+        <Text text="{excelData>Finished Good ID}" />
+        <Text text="{excelData>Finished Good Weight(kg)}" />
+        <Text text="{excelData>Emissions Intensity(kgco2e/kg)}" />
+        <Text text="{excelData>Emissions allocated to FG(kgco2e)}" />
+      </cells>
+			
+       </ColumnListItem>
+       	
+			</items>
+		</Table>
+     
+    </smartTable:SmartTable>
+</Panel>
+        </content>
+          
+        
+  
+ </Page>
+</mvc:View>
