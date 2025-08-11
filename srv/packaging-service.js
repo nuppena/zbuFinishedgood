@@ -70,15 +70,26 @@ module.exports = async (srv) => {
         
           
         const awsConnect= await cds.connect.to("AWSAPI");
-    
-       const res =  await awsConnect.tx(request).post("/api/loadFinishedGoods",savePayload)
-       console.log("Payload::::" +JSON.stringify(res));
-
-       const rMessage = {
+    try{
+      const res = await awsConnect.tx(request).post("/api/loadFinishedGoods",savePayload)
+     const rMessage = {
         "Status":"200",
         "Message":res
        }
        return rMessage;
+    }catch(err) {
+      console.log("err------------>", err)
+      return err;
+      //return res.status(500).send({ret_code: ReturnCodes.SOMETHING_WENT_WRONG});
+    } 
+      
+       //console.log("Payload::::" +JSON.stringify(res));
+
+      //  const rMessage = {
+      //   "Status":"200",
+      //   "Message":res
+      //  }
+      //  return rMessage;
     
           });
 };

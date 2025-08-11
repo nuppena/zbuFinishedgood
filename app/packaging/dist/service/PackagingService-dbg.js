@@ -2,7 +2,7 @@ sap.ui.define([
     "./CoreService"
 ], function (CoreService) {
     "use strict";
-    let PackagingService = CoreService.extend("pcf.com.acc.packaging.service.PackagingService", {
+    let PackagingService = CoreService.extend("pcf.com.acc.packaging.finishedgoods.service.PackagingService", {
         /**
          * @class
          * @abstract

@@ -5,9 +5,9 @@ Content-Type: application/json
     "uName": "uppena",
     "material": [
         {
-            "Site_ID": "DE2",
+            "Site_ID": "DEN3",
             "Finished_Good_ID": "G2",
-            "Finished_Good_Weight": 24.5
+            "Finished_Good_Weight": 35
         }
     ]
 }

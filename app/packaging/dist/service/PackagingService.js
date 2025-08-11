@@ -1,2 +1,2 @@
-sap.ui.define(["./CoreService"],function(c){"use strict";let e=c.extend("pcf.com.acc.packaging.service.PackagingService",{constructor:function(e){c.call(this,e)},uploadData:function(c){return this.odata("/uploadFile").post(c)}});return e});
+sap.ui.define(["./CoreService"],function(e){"use strict";let c=e.extend("pcf.com.acc.packaging.finishedgoods.service.PackagingService",{constructor:function(c){e.call(this,c)},uploadData:function(e){return this.odata("/uploadFile").post(e)}});return c});
 //# sourceMappingURL=PackagingService.js.map

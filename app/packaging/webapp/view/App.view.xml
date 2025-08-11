@@ -1,4 +1,4 @@
-<mvc:View controllerName="pcf.com.acc.packaging.controller.App"
+<mvc:View controllerName="pcf.com.acc.packaging.finishedgoods.controller.App"
     displayBlock="true"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m">

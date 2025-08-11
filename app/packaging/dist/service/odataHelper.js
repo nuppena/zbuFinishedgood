@@ -1,0 +1,2 @@
+sap.ui.define([],function(){"use strict";return{readData:function(n,e){return new Promise(function(t,r){n.create(e,{},{success:function(n){t(n)},error:function(n){r(n)}})})},getData:function(n,e){return new Promise(function(t,r){n.read(e,{},{success:function(n){t(n)},error:function(n){r(n)}})})},postData:function(n,e,t){return new Promise(function(r,c){n.create(e,t,{success:function(n){r(n)},error:function(n){c(n)}})})}}});
+//# sourceMappingURL=odataHelper.js.map

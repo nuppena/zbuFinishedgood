@@ -1,14 +1,19 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/core/BusyIndicator",
-    "sap/m/MessageBox"
-], (Controller,BusyIndicator,MessageBox) => {
+    "sap/m/MessageBox",
+    "pcf/com/acc/packaging/finishedgoods/service/odataHelper",
+    "pcf/com/acc/packaging/finishedgoods/lib/xlsx.full.min",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator"
+], (Controller,BusyIndicator,MessageBox,odataHelper,xlsx,Filter,FilterOperator) => {
     "use strict";
 
-    return Controller.extend("pcf.com.acc.packaging.controller.Packaging", {
+    return Controller.extend("pcf.com.acc.packaging.finishedgoods.Packaging", {
         onInit() {
-          //this.PackagingState = this.getOwnerComponent().getState("Packaging");
+          this.PackagingState = this.getOwnerComponent().getState("Packaging");
          this.PackagingService = this.getOwnerComponent().getService("Packaging");
+         this.oGlobalBusyDialog = new sap.m.BusyDialog(); 
         },
         onDownloadTemplate: function(){
             var fileName = "Finished Goods.xlsx";
@@ -27,6 +32,25 @@ sap.ui.define([
                 this._selectedFile = oFile;
             }
         },
+        loadXLSXLibrary: function () {
+          return new Promise(function (resolve, reject) {
+              if (window.XLSX) {
+                  resolve();
+                  return;
+              }
+       
+              var script = document.createElement("script");
+              script.src = jQuery.sap.getModulePath("pcf.com.acc.packaging.finishedgoods.lib", "/xlsx.full.min.js");
+              script.onload = function () {
+                  resolve();
+              };
+              script.onerror = function () {
+                  reject("Failed to load XLSX library");
+              };
+       
+              document.head.appendChild(script);
+          });
+      },      
         onUploadFile: function () {
             if (!this._selectedFile) {
                 sap.m.MessageToast.show("Please select a file first.");
@@ -36,7 +60,8 @@ sap.ui.define([
           
             const requiredFields = ["Site ID", "Finished Good ID", "Finished Good Weight(kg)"];
             const that = this;
-          
+            this.loadXLSXLibrary().then(function () {
+             // var file = oEvent.getParameter("files")[0];
             var reader = new FileReader();
             reader.onload = function (e) {
                 var data = e.target.result;
@@ -44,16 +69,16 @@ sap.ui.define([
                 var sheetName = workbook.SheetNames[0];
                 var worksheet = workbook.Sheets[sheetName];
                 var jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-          
+         
                 // ✅ Check if Excel is completely empty or has only headers
                 if (!jsonData || jsonData.length === 0) {
                     MessageBox.error("Please fill all the mandatory fields.");
                     that.getView().getModel("excelData").setData({ results: [] });
                     return;
                 }
-          
+         
                 let invalidRowIndexes = [];
-          
+         
                 jsonData.forEach((row, index) => {
                     let isValid = requiredFields.every(field => row[field] && row[field].toString().trim() !== "");
                     if (!isValid) {
@@ -61,7 +86,7 @@ sap.ui.define([
                         invalidRowIndexes.push(index + 2);
                     }
                 });
-          
+         
                 if (invalidRowIndexes.length > 0) {
                     MessageBox.error(
                         "Please fill all the mandatory fields.\nMissing fields Row Numbers: " + invalidRowIndexes.join(", ")
@@ -69,20 +94,23 @@ sap.ui.define([
                     that.getView().getModel("excelData").setData({ results: [] });
                     return;
                 }
-          
+         
                 // All rows are valid — bind to model
                 var oModel = new sap.ui.model.json.JSONModel();
                 oModel.setData({ results: jsonData });
                 that.getView().setModel(oModel, "excelData");
-          
+         
                 MessageBox.success("File uploaded and validated successfully.");
-          
+         
                 if (that._oUploadDialog) {
                     that._oUploadDialog.close();
                 }
             };
-          
-            reader.readAsBinaryString(this._selectedFile);
+         
+            reader.readAsBinaryString(that._selectedFile);
+          }).catch(function (error) {
+            console.error(error);
+        });
           },
          
         onOpenUploadDialog: function () {
@@ -118,7 +146,163 @@ sap.ui.define([
         
             this._oUploadDialog.open();
         },
-        
+
+        handleTxtFilter: function(oEvent) {
+          const sQuery = oEvent.getParameter("query").trim();
+        if (!sQuery) {
+          this.byId("ftable").getBinding("rows").filter([]);
+          return;
+        }
+    
+        const aFilters = [
+          new Filter("Site ID", FilterOperator.Contains, sQuery),
+          new Filter("Finished Good ID", FilterOperator.Contains, sQuery),
+          new Filter("Error Status", FilterOperator.Contains, sQuery),
+          // new Filter("Short Description", FilterOperator.Contains, sQuery),
+          // new Filter("Spend Currency Unit", FilterOperator.Contains, sQuery),
+          // new Filter("Weight Unit", FilterOperator.Contains, sQuery)
+        ];
+    
+        // Handle numeric inputs for materialid, spendinmillions, weight
+        const fNum = parseFloat(sQuery);
+        if (!isNaN(fNum)) {
+          aFilters.push(
+            new Filter("Finished Good Weight(kg)", FilterOperator.EQ, fNum),
+            new Filter("Emission Intensity", FilterOperator.EQ, fNum),
+            new Filter("Emission Allocated to Final Good(Kgco2e)", FilterOperator.EQ, fNum)
+          );
+        }
+    
+        const oMultiFilter = new Filter({
+          filters: aFilters,
+          and: false // OR logic
+        });
+    
+        this.byId("ftable").getBinding("rows").filter(oMultiFilter);
+      },
+
+
+        onSaveChanges: function () {
+          const that = this;
+            const oModel = this.getView().getModel("excelData");
+
+            if (!oModel || !oModel.getData().results || oModel.getData().results.length === 0) {
+                MessageBox.warning("No data available to save.");
+                return;
+            }
+
+            const aData = oModel.getData().results;
+
+           
+            const matPost = [];
+            for(let i=0;i<aData.length;i++){
+            
+              matPost.push({
+            "Site_ID": aData[i]['Site ID'],
+            "Finished_Good_ID": aData[i]['Finished Good ID'],     
+            "Finished_Good_Weight":aData[i]['Finished Good Weight(kg)'],
+              });
+            }
+            
+            const savePayload = {
+              "uName": "uppena",
+              "material":matPost
+            }
+
+            this.oGlobalBusyDialog.open();     
+      var oModel1 = this.getOwnerComponent().getModel();
+           
+          odataHelper.postData(oModel1, "/loadFinishedGoods", savePayload)
+               .then((oData) => {
+                
+                  if(oData.loadFinishedGoods.Status == "200"){
+                    that.onRunExecute();
+                  }
+                  if(oData.loadFinishedGoods.statusCode == 502){
+                    let errMessag = oData.loadFinishedGoods.reason.response.body.error;
+                    MessageBox.error(errMessag.split(":")[1]+":"+errMessag.split(":")[2]);
+                    this.oGlobalBusyDialog.close();
+                  }
+                 
+              })
+              .catch((oError) => {
+                    // Handle the error
+                    console.error("Error reading data:", oError);
+                    this.oGlobalBusyDialog.close();
+                    // Display an error message, etc.
+                });
+         
+          
+          
+            // Convert JSON data to Excel sheet
+            // const worksheet = XLSX.utils.json_to_sheet(aData);
+            // const workbook = XLSX.utils.book_new();
+            // XLSX.utils.book_append_sheet(workbook, worksheet, "Updated Data");
+
+            //  download of the updated Excel file
+            //XLSX.writeFile(workbook, "Updated_PackagingData.xlsx");
+
+            //MessageBox.success("Changes saved successfully!");
+        },
+        onRunExecute: function(){
+          const that = this;
+        var oModel1 = this.getOwnerComponent().getModel();
+         
+        odataHelper.readData(oModel1, "/runFinishedGoods")
+             .then((oData) => {
+
+             // console.log("RUN PAYLOAD" + oData.saveData.result );
+
+              if(oData.runFinishedGoods.Message.result == "Batch emission values updated successfully."){
+                 that.onAPIExecute();
+             }
+             
+            })
+            .catch((oError) => {
+                  // Handle the error
+                  console.error("Error reading data:", oError);
+                  that.oGlobalBusyDialog.close();
+                  // Display an error message, etc.
+              });
+
+        },
+        onAPIExecute: function () {
+          const that = this;
+          var oModel1 = this.getOwnerComponent().getModel();
+               
+              odataHelper.readData(oModel1, "/fetchFinishedGoods")
+                    // .then(function(oData)=> {
+                    //     // Handle successful data retrieval
+                    //     console.log("Data received:", oData);
+                    //     // Example:  Bind the data to a control
+                    //     // this.getView().byId("myTable").setModel(new sap.ui.model.json.JSONModel(oData));
+                    // })
+                    .then((oData) => {
+                      // Arrow function preserves 'this'
+                      var aTableData = oData.fetchFinishedGoods.Message.result;
+                      // aTableData.forEach(row => {
+                      //   const match = row.top_activity_ids.find(item => item.result_id === row.active_result_id);
+                      //   row.mapped_activity_id = match ? match.activity_id : null;
+                      // });
+                      var oModel = new sap.ui.model.json.JSONModel({ results: aTableData });
+    
+                      // Set to a named model
+                      this.getView().setModel(oModel, "excelData");
+                      //this.getView().byId("table").setModel(new sap.ui.model.json.JSONModel(oData));
+                     // this.getView().byId("smartTable").rebindTable();
+                      this.getView().getModel().refresh(true);
+                      this.oGlobalBusyDialog.close();
+                  })
+                  .catch((oError) => {
+                        // Handle the error
+                        console.error("Error reading data:", oError);
+                        // Display an error message, etc.
+                        this.oGlobalBusyDialog.close();
+                    });
+         // this._chkFile().then(function () {
+            //return that._uploadFileExecute();
+         // });
+        },
         onImportExcel: function () {
             var oFileUploader = this.byId("fileUploader");
             if (oFileUploader) {

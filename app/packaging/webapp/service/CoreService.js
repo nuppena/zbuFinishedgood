@@ -2,7 +2,7 @@ sap.ui.define([
 	"sap/ui/base/Object"
 ], function (Object) {
 	"use strict";
-	return Object.extend("pcf.com.acc.packaging.service.CoreService", {
+	return Object.extend("pcf.com.acc.packaging.finishedgoods.service.CoreService", {
 		/**
 		 * constructor of the coreService that gets inililised from the input modes-oModel 
 		 * @param {Object} oModel 

@@ -8,7 +8,6 @@ modules:
   path: gen/srv
   requires:
   - name: zbuFinishedgood-auth
-  - name: zbuFinishedgood-connectivity
   - name: zbuFinishedgood-destination
   provides:
   - name: srv-api
@@ -83,16 +82,11 @@ resources:
     path: ./xs-security.json
     service: xsuaa
     service-plan: application
-- name: zbuFinishedgood-connectivity
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: connectivity
-    service-plan: lite
 - name: zbuFinishedgood-destination
   type: org.cloudfoundry.managed-service
   parameters:
     config:
-      HTML5Runtime_enabled: false
+      HTML5Runtime_enabled: true
       init_data:
         instance:
           destinations:
@@ -101,9 +95,20 @@ resources:
             ProxyType: Internet
             Type: HTTP
             URL: https://ui5.sap.com
+          - Authentication: NoAuthentication
+            HTML5.DynamicDestination: true
+            HTML5.Timeout: 1200000
+            HTML5.ForwardAuthToken: true
+            Name: zbuFinishedgood-srv
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{srv-api/srv-url}
           existing_destinations_policy: update
     service: destination
+    service-name: zbuFinishedgood-destination
     service-plan: lite
+  requires:
+  - name: srv-api  
 - name: zbuFinishedgood_html_repo_host
   type: org.cloudfoundry.managed-service
   parameters:

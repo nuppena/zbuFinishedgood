@@ -10,7 +10,7 @@
       ]
     },
     "applicationVersion": {
-      "version": "0.0.1"
+      "version": "0.0.3"
     },
     "title": "{{appTitle}}",
     "description": "{{appDescription}}",
@@ -34,7 +34,7 @@
       "inbounds": {
         "zbufinishedgoods-create": {
           "semanticObject": "zbufinishedgoods",
-          "action": "create",
+          "action": "display",
           "title": "{{zbufinishedgoods-create.flpTitle}}",
           "signature": {
             "parameters": {},
@@ -63,7 +63,7 @@
   "sap.ui5": {
     "flexEnabled": true,
     "dependencies": {
-      "minUI5Version": "1.138.1",
+      "minUI5Version": "1.138.0",
       "libs": {
         "sap.m": {},
         "sap.ui.core": {}
@@ -77,7 +77,7 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "pcf.com.acc.packaging.i18n.i18n"
+          "bundleName": "pcf.com.acc.packaging.finishedgoods.i18n.i18n"
         }
       },
       "": {
@@ -106,9 +106,9 @@
         "transition": "slide",
         "type": "View",
         "viewType": "XML",
-        "path": "pcf.com.acc.packaging.view",
+        "path": "pcf.com.acc.packaging.finishedgoods.view",
         "async": true,
-        "viewPath": "pcf.com.acc.packaging.view"
+        "viewPath": "pcf.com.acc.packaging.finishedgoods.view"
       },
       "routes": [
         {
@@ -127,7 +127,7 @@
       }
     },
     "rootView": {
-      "viewName": "pcf.com.acc.packaging.view.App",
+      "viewName": "pcf.com.acc.packaging.finishedgoods.view.App",
       "type": "XML",
       "id": "App",
       "async": true

@@ -2,33 +2,24 @@
   xmlns:mvc="sap.ui.core.mvc"
   xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
   xmlns:smartTable="sap.ui.comp.smarttable"
-  xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified"  xmlns:f="sap.f"
+  xmlns:core="sap.ui.core" xmlns:table="sap.ui.table" xmlns:u="sap.ui.unified"  xmlns:f="sap.f"
   xmlns="sap.m" xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
-  controllerName="pcf.com.acc.packaging.controller.Packaging">
+  controllerName="pcf.com.acc.packaging.finishedgoods.controller.Packaging">
   <Page id="page1" showHeader="true"  title="Mapping to finished goods" titleAlignment="Center">
    <content>
-  <Panel >
+  <!-- <Panel >
                     <VBox class="sapUiSmallMargin">
                    <HBox justifyContent="End" alignItems="Center" class="sapUiSmallMarginBottom">
                             <Button text="Download Template" type="Transparent" press="onDownloadTemplate" class="sapUiTinyMarginEnd"/>
                             <Button text="Import" type="Transparent" press="onOpenUploadDialog" class="sapUiTinyMarginEnd"/>
                              <Button text="Export" type="Transparent" press="onExport" class="sapUiTinyMarginEnd"/>
-                             <Button text="Run"  type="Emphasized" press="onSaveProgress"/>
+                             <Button text="Run"  type="Emphasized" press="onSaveChanges"/>
      
                         </HBox>
                     </VBox>
-  </Panel>
-<Panel >
-<smartFilterBar:SmartFilterBar
-      id="smartFilterBar"
-      entitySet="EFData"
-      liveMode="false"
-    enableBasicSearch="true"
-      persistencyKey="EFCalculationFilter"
-       >
-        
-  </smartFilterBar:SmartFilterBar>
-    <smartTable:SmartTable
+  </Panel> -->
+<Panel>
+    <!-- <smartTable:SmartTable
       id="smartTable"
       entitySet="EFData"
       smartFilterId="smartFilterBar"
@@ -74,7 +65,7 @@
 
               <Column id="Spend" hAlign="Begin">
                 <customData>
-                  <core:CustomData key="p13nData" value='{"columnKey":"Spend","leadingProperty":"Spend(in Millions)","columnIndex":7,"filterProperty":"Spend(in Millions)","sortProperty":"Spend(in Millions)","type":"numeric"}'/>
+                  <core:CustomData key="p13nData" value='{"columnKey":"Spend","leadingProperty":"Spend(in Millions)","columnIndex":7,"filterProperty":"Spend(in Millions)","sortProperty":"Spend(in Millions)"}'/>
                 </customData>
                 <Text text="Emissions Intensity(kgCO₂e/kg)"/>
               </Column>
@@ -93,8 +84,8 @@
         <Text text="{excelData>Site ID}" />
         <Text text="{excelData>Finished Good ID}" />
         <Text text="{excelData>Finished Good Weight(kg)}" />
-        <Text text="{excelData>Emissions Intensity(kgco2e/kg)}" />
-        <Text text="{excelData>Emissions allocated to FG(kgco2e)}" />
+        <Text text="{excelData>Emission Intensity}" />
+        <Text text="{excelData>Emission Allocated to Final Good(Kgco2e)}" />
       </cells>
 			
        </ColumnListItem>
@@ -102,7 +93,135 @@
 			</items>
 		</Table>
      
-    </smartTable:SmartTable>
+    </smartTable:SmartTable> -->
+
+    <table:Table
+                    id="ftable"
+                    rows="{excelData>/results}"
+                    selectionMode="None"
+                    enableBusyIndicator="true"
+                    enableCellFilter="true"
+                    enableColumnReordering="true"
+                    columnHeaderVisible="true"
+                    width="100%"
+                >
+                    <table:extension>
+                    <OverflowToolbar style="Clear">
+                    <ToolbarSpacer/>
+                    <SearchField
+						placeholder="Filter"
+						value="{ui>/filterValue}"
+						search="handleTxtFilter"
+						width="15rem"/>
+                           
+                        <Button
+                            text="Download Template"
+                            type="Transparent"
+                            press="onDownloadTemplate"
+                            class="sapUiTinyMarginEnd"
+                        />
+                        <Button
+                            text="Import"
+                            type="Transparent"
+                            press="onOpenUploadDialog"
+                            class="sapUiTinyMarginEnd"
+                        />
+                        <Button
+                            text="Export"
+                            type="Transparent"
+                            press="onExport"
+                            class="sapUiTinyMarginEnd"
+                        />
+                         <Button
+                            id="btRun"
+                            text="Run"
+                            type="Emphasized"
+                            press="onSaveChanges"
+                            class="sapUiTinyMarginEnd"
+                        />
+                        <Button
+                            id="btSave"
+                            text="Run"
+                            type="Emphasized"
+                            press="onEditChanges"
+                            visible="false"
+                        />
+
+                    </OverflowToolbar>
+                    </table:extension>
+
+               
+                  	<table:columns>		
+                        <table:Column
+                            label="SiteID"
+                            sortProperty="Site ID"
+                            filterProperty="Site ID"
+                            width="10%"
+                        >
+                            <table:template>
+                                <Text text="{excelData>Site ID}" />
+                            </table:template>
+                        </table:Column>
+
+                  
+                        <table:Column
+                            label="Finished Good ID"
+                            filterProperty="Finished Good ID"
+                            width="10%"
+                        >
+                            <table:template>
+                                <Text text="{excelData>Finished Good ID}" 
+                                wrapping="false"/>
+                            </table:template>
+                        </table:Column>
+
+                  
+                        <table:Column
+                            label="Finished Good Weight(kg)"
+                            sortProperty="Finished Good Weight(kg)"
+                            filterProperty="Finished Good Weight(kg)"
+                            width="15%">
+                            <table:template>
+                                <Text text="{excelData>Finished Good Weight(kg)}" wrapping="false"/>
+                            </table:template>
+                        </table:Column>
+
+                  
+                        <table:Column
+                            label="Emissions Intensity(kgCO₂e/kg)"
+                            filterProperty="Emission Intensity"
+                            width="20%"
+                        >
+                            <table:template>
+                                <Text text="{excelData>Emission Intensity}"
+                                wrapping="false" />
+                            </table:template>
+                        </table:Column>
+
+                  
+                        <table:Column
+                            label="Emission Allocated to Final Good(Kgco2e)"
+                            filterProperty="Emission Allocated to Final Good(Kgco2e)"
+                            width="25%"
+                        >
+                            <table:template>
+                                <Text text="{excelData>Emission Allocated to Final Good(Kgco2e)}" 
+                                wrapping="false"/>
+                            </table:template>
+                        </table:Column>
+                       <table:Column
+                            label="ErrorStatus"
+                            sortProperty="Error Status"
+                            filterProperty="Error Status"
+                            width="20%">
+                            <table:template>
+                                <Text text="{excelData>Error Status}" />
+                            </table:template>
+                        </table:Column>
+
+                    </table:columns>	
+                </table:Table>
+
 </Panel>
         </content>
           

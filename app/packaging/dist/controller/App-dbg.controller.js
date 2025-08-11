@@ -3,7 +3,7 @@ sap.ui.define([
 ], (BaseController) => {
   "use strict";
 
-  return BaseController.extend("pcf.com.acc.packaging.controller.App", {
+  return BaseController.extend("pcf.com.acc.packaging.finishedgoods.controller.App", {
       onInit() {
       }
   });

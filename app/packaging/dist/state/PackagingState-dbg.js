@@ -2,7 +2,7 @@ sap.ui.define([
     "../model/BaseObject"
 ], function (BaseObject) {
     "use strict";
-    let PackagingState = BaseObject.extend("pcf.com.acc.packaging.state.PackagingState", {
+    let PackagingState = BaseObject.extend("pcf.com.acc.packaging.finishedgoods.state.PackagingState", {
         /**
         * @class
         * @abstract
