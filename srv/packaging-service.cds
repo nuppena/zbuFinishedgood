@@ -1,10 +1,10 @@
-service PackagingEFCalculation {
+service PackagingFinshCalculation {
 
      action uploadFile( payload : array of fileUpload) returns array of resultMessage;
      action loadFinishedGoods(uName: String, material: array of savePay) returns resultMessage;
      function userInfoUAA() returns String;
-     action fetchFinishedGoods() returns resultMessage;
-      action runFinishedGoods() returns resultMessage;
+     action fetchFinishedGoods(uName: String) returns resultMessage;
+      action runFinishedGoods(uName: String) returns resultMessage;
 
 type savePay:{
     Site_ID : String;

@@ -3,22 +3,44 @@ sap.ui.define([
     "sap/ui/core/BusyIndicator",
     "sap/m/MessageBox",
     "pcf/com/acc/packaging/finishedgoods/service/odataHelper",
-    "pcf/com/acc/packaging/finishedgoods/lib/xlsx.full.min",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator"
-], (Controller,BusyIndicator,MessageBox,odataHelper,xlsx,Filter,FilterOperator) => {
+], (Controller,BusyIndicator,MessageBox,odataHelper,Filter,FilterOperator) => {
     "use strict";
 
     return Controller.extend("pcf.com.acc.packaging.finishedgoods.Packaging", {
         onInit() {
+          var that=this;
+          this.userID="demoTestUser";
           this.PackagingState = this.getOwnerComponent().getState("Packaging");
          this.PackagingService = this.getOwnerComponent().getService("Packaging");
          this.oGlobalBusyDialog = new sap.m.BusyDialog(); 
+          if (sap.ushell && sap.ushell.Container && sap.ushell.Container.getService) {
+        sap.ushell.Container.getServiceAsync("UserInfo").then(function(oUserInfo) {
+            if (oUserInfo) {
+                var uID = oUserInfo.getId(); // Get the user's ID
+                //console.log("Logged-in BTP user ID:", sUserId);
+
+                // You can also retrieve other user details:
+                that.userID = oUserInfo.getEmail();
+                // var sFirstName = oUserInfo.getFirstName();
+               // var sFullName = oUserInfo.getShellUserInfo().getFullName();
+
+                //console.log("Logged-in BTP user ID details:", sUserId +":"+sEmail);
+
+            }
+        }).catch(function(oError) {
+            console.error("Error getting UserInfo service:", oError);
+        });
+    } else {
+        console.warn("SAP Fiori Launchpad shell services not available. User information may not be accessible.");
+    }
         },
         onDownloadTemplate: function(){
-            var fileName = "Finished Goods.xlsx";
+            var fileName = "Finished_Goods.xlsx";
             //  var sURL = sap.ui.require.toUrl(`zbue0004_massresui/DownloadTemplate/${fileName}`);
-            var sURL = `./DownloadTemplate/${fileName}`;
+          var sURL = sap.ui.require.toUrl(`pcf/com/acc/packaging/finishedgoods/DownloadTemplate/${fileName}`);
+            // var sURL = `./DownloadTemplate/${fileName}`;
             const oA = document.createElement("a");
             oA.href = sURL;
             oA.style.display = "none";
@@ -205,7 +227,7 @@ sap.ui.define([
             }
             
             const savePayload = {
-              "uName": "uppena",
+              "uName": this.userID,
               "material":matPost
             }
 
@@ -247,8 +269,12 @@ sap.ui.define([
         onRunExecute: function(){
           const that = this;
         var oModel1 = this.getOwnerComponent().getModel();
+
+         const runPayload = {
+              "uName": this.userID
+            }
          
-        odataHelper.readData(oModel1, "/runFinishedGoods")
+        odataHelper.postData(oModel1, "/runFinishedGoods", runPayload)
              .then((oData) => {
 
              // console.log("RUN PAYLOAD" + oData.saveData.result );
@@ -269,8 +295,12 @@ sap.ui.define([
         onAPIExecute: function () {
           const that = this;
           var oModel1 = this.getOwnerComponent().getModel();
+
+          const fetchPayload = {
+              "uName": this.userID
+            }
                
-              odataHelper.readData(oModel1, "/fetchFinishedGoods")
+              odataHelper.postData(oModel1, "/fetchFinishedGoods", fetchPayload)
                     // .then(function(oData)=> {
                     //     // Handle successful data retrieval
                     //     console.log("Data received:", oData);

@@ -21,7 +21,7 @@ module.exports = async (srv) => {
       });
       srv.on('runFinishedGoods',async(request) =>{
         const yourData= {
-          "User Name": "uppena"
+          "User Name":request.data.uName
           };
        const awsConnect= await cds.connect.to("AWSAPI");
        const res = await awsConnect.tx(request).post("/api/runFinishedGoods",yourData)
@@ -36,7 +36,7 @@ module.exports = async (srv) => {
     
       srv.on('fetchFinishedGoods',async(request) =>{
         const yourData= {
-           "User Name": "uppena"
+           "User Name": request.data.uName
            };
         const awsConnect= await cds.connect.to("AWSAPI");
         const res = await awsConnect.tx(request).post("/api/fetchFinishedGoods",yourData)

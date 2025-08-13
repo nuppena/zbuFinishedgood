@@ -1,7 +1,7 @@
 {
   "_version": "1.65.0",
   "sap.app": {
-    "id": "pcf.com.acc.packaging.FinishedGoods",
+    "id": "pcf.com.acc.packaging.finishedgoods",
     "type": "application",
     "i18n": {
       "bundleUrl": "i18n/i18n.properties",
@@ -22,7 +22,7 @@
     },
     "dataSources": {
       "mainService": {
-        "uri": "/odata/v2/packaging-efcalculation/",
+        "uri": "/odata/v2/packaging-finsh-calculation/",
         "type": "OData",
         "settings": {
           "annotations": [],
@@ -62,6 +62,10 @@
   },
   "sap.ui5": {
     "flexEnabled": true,
+    "supportedLocales": [
+      "en"
+    ],
+    "fallbackLocale": "en",
     "dependencies": {
       "minUI5Version": "1.138.0",
       "libs": {
@@ -77,7 +81,10 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "pcf.com.acc.packaging.finishedgoods.i18n.i18n"
+          "bundleName": "pcf.com.acc.packaging.finishedgoods.i18n.i18n",
+          "supportedLocales": [
+            ""
+          ]
         }
       },
       "": {
@@ -87,7 +94,8 @@
         "settings": {
           "operationMode": "Server",
           "autoExpandSelect": true,
-          "earlyRequests": true
+          "earlyRequests": true,
+          "useBatch": false
         }
       }
     },

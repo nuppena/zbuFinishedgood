@@ -7,7 +7,12 @@
       "target": "/odata/$1",
       "authenticationType": "xsuaa",
       "destination": "zbuFinishedgood-srv",
-       "csrfProtection": true
+      "csrfProtection": true
+    },
+    {
+      "source": "^/user-api(.*)",
+      "target": "$1",
+      "service": "sap-approuter-userapi"
     },
     {
       "source": "^/resources/(.*)$",
