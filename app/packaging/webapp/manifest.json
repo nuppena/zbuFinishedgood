@@ -23,7 +23,11 @@
           "annotations": [],
           "odataVersion": "2.0"
         }
-      }
+      },
+      "locDataSource": {
+				"uri": "model/localModel.json",
+				"type": "JSON"
+		}
     },
     "crossNavigation": {
       "inbounds": {
@@ -89,7 +93,11 @@
           "earlyRequests": true,
           "useBatch": false
         }
-      }
+      },
+       "locModel": {
+      "type": "sap.ui.model.json.JSONModel",
+      "dataSource": "locDataSource"
+    }
     },
     "resources": {
       "css": [

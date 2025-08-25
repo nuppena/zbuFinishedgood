@@ -27,7 +27,7 @@ sap.ui.define([
                // var sFullName = oUserInfo.getShellUserInfo().getFullName();
 
                 //console.log("Logged-in BTP user ID details:", sUserId +":"+sEmail);
-
+              that.onAPIExecute();
             }
         }).catch(function(oError) {
             console.error("Error getting UserInfo service:", oError);
@@ -35,6 +35,7 @@ sap.ui.define([
     } else {
         console.warn("SAP Fiori Launchpad shell services not available. User information may not be accessible.");
     }
+   
         },
         onDownloadTemplate: function(){
             var fileName = "Finished_Goods.xlsx";
@@ -118,12 +119,17 @@ sap.ui.define([
                 }
          
                 // All rows are valid — bind to model
-                var oModel = new sap.ui.model.json.JSONModel();
-                oModel.setData({ results: jsonData });
-                that.getView().setModel(oModel, "excelData");
+                // var oModel = new sap.ui.model.json.JSONModel();
+                // oModel.setData({ results: jsonData });
+                // that.getView().setModel(oModel, "excelData");
          
-                MessageBox.success("File uploaded and validated successfully.");
-         
+                // MessageBox.success("File uploaded and validated successfully.");
+                that.getOwnerComponent().getModel("locModel").setProperty("/excelData",jsonData);
+
+                 if(jsonData || jsonData.length > 0){
+                  that.onSaveChanges();
+                  }
+
                 if (that._oUploadDialog) {
                     that._oUploadDialog.close();
                 }
@@ -206,7 +212,10 @@ sap.ui.define([
 
         onSaveChanges: function () {
           const that = this;
-            const oModel = this.getView().getModel("excelData");
+            //const oModel = this.getView().getModel("excelData");
+            var exData = this.getOwnerComponent().getModel("locModel").getProperty("/excelData");
+             var oModel = new sap.ui.model.json.JSONModel();
+            oModel.setData({ results: exData });
 
             if (!oModel || !oModel.getData().results || oModel.getData().results.length === 0) {
                 MessageBox.warning("No data available to save.");
@@ -294,6 +303,7 @@ sap.ui.define([
         },
         onAPIExecute: function () {
           const that = this;
+          this.byId("ftable").setEnableBusyIndicator(true);
           var oModel1 = this.getOwnerComponent().getModel();
 
           const fetchPayload = {
@@ -322,12 +332,14 @@ sap.ui.define([
                      // this.getView().byId("smartTable").rebindTable();
                       this.getView().getModel().refresh(true);
                       this.oGlobalBusyDialog.close();
+                      this.byId("ftable").setEnableBusyIndicator(false);
                   })
                   .catch((oError) => {
                         // Handle the error
                         console.error("Error reading data:", oError);
                         // Display an error message, etc.
                         this.oGlobalBusyDialog.close();
+                        this.byId("ftable").setEnableBusyIndicator(false);
                     });
          // this._chkFile().then(function () {
             //return that._uploadFileExecute();
@@ -540,13 +552,32 @@ sap.ui.define([
     
         const aData = oModel.getData().results;
     
-        
-        const worksheet = XLSX.utils.json_to_sheet(aData);
+        this.loadXLSXLibrary().then(function () {
+
+          // const worksheet = XLSX.utils.json_to_sheet(aData);
+           var worksheet = XLSX.utils.json_to_sheet(aData);
+  const headersToKeep = ["Site ID", "Finished Good ID", "Finished Good Weight(kg)", "Emission Intensity", "Emission Allocated to Final Good(Kgco2e)", "Error Status"];  // Replace with your actual field names
+ 
+  // Create filtered data array containing only the selected columns
+  const filteredData = aData.map(item =>
+    Object.fromEntries(
+      headersToKeep.map(h => [h, item[h]])
+    )
+  );
+ // Generate worksheet and workbook with specified headers order
+  var worksheet = XLSX.utils.json_to_sheet(filteredData, { header: headersToKeep });
+
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Exported Data");
     
         
         XLSX.writeFile(workbook, "Finished Goods.xlsx");
+
+}).catch(function (error) {
+console.error(error);
+});
+        
+       
     }
     
     });

@@ -132,7 +132,7 @@
                             press="onExport"
                             class="sapUiTinyMarginEnd"
                         />
-                         <Button
+                         <!-- <Button
                             id="btRun"
                             text="Run"
                             type="Emphasized"
@@ -145,7 +145,7 @@
                             type="Emphasized"
                             press="onEditChanges"
                             visible="false"
-                        />
+                        /> -->
 
                     </OverflowToolbar>
                     </table:extension>
